@@ -32,6 +32,7 @@ def precedence(operator: str) -> int: # Define operator precedence
 
 """
 Shunting Yard Algorithm
+
 - Symbols go straight to output
 - Operators go into operator stack
 - When higher/equal precedence operator is already on stack, pop it first
