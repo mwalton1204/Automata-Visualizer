@@ -153,3 +153,46 @@ def nfa_to_dfa(nfa: NFA) -> DFA:
                 stack.append(next_state)
         
     return DFA(start_state, accept_states, transitions, alphabet)
+
+def dfa_to_dict(dfa: DFA) -> dict:
+    """
+    Convert a DFA into a JSON-friendly dictionary.
+
+    DFA states are frozensets of NFA State objects, so assign each DFA state
+    a numeric ID for serialization and frontend visualization.
+    """
+    state_ids = {}
+    next_id = 0
+
+    # Assign IDs to all DFA states that appear in transitions
+    for state in dfa.transitions:
+        if state not in state_ids:
+            state_ids[state] = next_id
+            next_id += 1
+
+        for target in dfa.transitions[state].values():
+            if target not in state_ids:
+                state_ids[target] = next_id
+                next_id += 1
+
+    # Make sure start state is included
+    if dfa.start_state not in state_ids:
+        state_ids[dfa.start_state] = next_id
+        next_id += 1
+
+    transitions = []
+
+    for from_state, symbol_map in dfa.transitions.items():
+        for symbol, to_state in symbol_map.items():
+            transitions.append({
+                "from": state_ids[from_state],
+                "to": state_ids[to_state],
+                "symbol": symbol
+            })
+
+    return {
+        "states": list(state_ids.values()),
+        "start": state_ids[dfa.start_state],
+        "accepts": [state_ids[state] for state in dfa.accept_states],
+        "transitions": transitions
+    }

@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 from services.regex_utils import insert_concat, to_postfix
 from services.nfa import postfix_to_nfa, nfa_to_dict
-from services.dfa import nfa_to_dfa
+from services.dfa import nfa_to_dfa, dfa_to_dict
 
 app = FastAPI()
 
@@ -33,12 +33,12 @@ def convert(req: RegexRequest):
     nfa = postfix_to_nfa(postfix)
     nfa_data = nfa_to_dict(nfa)
     dfa = nfa_to_dfa(nfa)
+    dfa_data = dfa_to_dict(dfa)
 
     return {
         "input": raw_regex,
         "with_concat": with_concat,
         "postfix": postfix,
         "nfa": nfa_data,
-        "dfa_start": str(dfa.start_state),
-        "dfa_accept_count": len(dfa.accept_states)
+        "dfa": dfa_data
     }
