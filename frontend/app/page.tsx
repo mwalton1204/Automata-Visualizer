@@ -12,8 +12,9 @@ export default function Home() {
     setError('')
     setResult(null)
 
+
     try {
-      // Send the regex to the backend API and await the response
+      // Send the regex to backend API and await the response
       const response = await fetch('http://127.0.0.1:8000/convert', {
         method: 'POST',
         headers: {
