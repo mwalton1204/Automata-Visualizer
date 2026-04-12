@@ -48,3 +48,38 @@ def move(states: set[State], symbol:str) -> set[State]:
             result.update(state.transitions[symbol])
     
     return result
+
+def get_alphabet (nfa: NFA) -> set[str]:
+    """
+    Collect all non-epsilon transition symbols used anywhere in the NFA.
+    - During subset construction, each DFA state must process every real input symbol.
+    - ε is not part of the alphabet because it does not consume input.
+
+    Example:
+        If the NFA has transitions on 'a' and 'b',
+        then the alphabet is {'a', 'b'}.
+    """
+
+    alphabet = set()
+    visited = set()
+    stack = [nfa.start]
+
+    while stack:
+        state = stack.pop()
+
+        if state in visited:
+            continue
+
+        visited.add(state)
+
+        # All keys in state.transitions are real input symbols
+        for symbol, targets in state.transitions.items():
+            alphabet.add(symbol)
+
+            for target in targets:
+                stack.append(target)
+
+        # ε-transitions are followed so we can reach all states,
+        # but ε itself is NOT added to the alphabet
+        for target in state.epsilon:
+            stack.append(target)
