@@ -10,26 +10,26 @@ class NFA:
         self.start = start
         self.accept = accept
 
-"""
-Convert a postfix regular expression into an NFA using Thompson's construction.
-
-- Read the postfix expression left → right
-- Use a stack to store partial NFA fragments
-- Each fragment has:
-    - start state
-    - accept state
-- When we see:
-    - a symbol → create a basic NFA and push it
-    - a unary operator (*, +, ?) → pop 1 fragment, modify it, push result
-    - a binary operator (., |) → pop 2 fragments, combine them, push result
-- At the end, exactly one NFA should remain on the stack
-
-Why postfix works:
-- Operators come AFTER their operands
-- So when we see an operator, the required fragments are already on the stack
-"""
-
 def postfix_to_nfa(postfix: str) -> NFA:
+    """
+    Convert a postfix regular expression into an NFA using Thompson's construction.
+
+    - Read the postfix expression left → right
+    - Use a stack to store partial NFA fragments
+    - Each fragment has:
+        - start state
+        - accept state
+    - When we see:
+        - a symbol → create a basic NFA and push it
+        - a unary operator (*, +, ?) → pop 1 fragment, modify it, push result
+        - a binary operator (., |) → pop 2 fragments, combine them, push result
+    - At the end, exactly one NFA should remain on the stack
+
+    Why postfix works:
+    - Operators come AFTER their operands
+    - So when we see an operator, the required fragments are already on the stack
+    """
+
     stack = []
 
     for char in postfix:
@@ -121,14 +121,14 @@ def postfix_to_nfa(postfix: str) -> NFA:
 
     return stack[0]
 
-"""
-Convert an NFA made of linked State objects into a JSON-friendly dictionary.
-
-Since State objects reference each other directly, we first assign each
-reachable state a numeric ID, then collect all transitions using those IDs.
-"""
-
 def nfa_to_dict(nfa: NFA) -> dict:
+    """
+    Convert an NFA made of linked State objects into a JSON-friendly dictionary.
+
+    Since State objects reference each other directly, we first assign each
+    reachable state a numeric ID, then collect all transitions using those IDs.
+    """
+
     state_ids = {}
     transitions = []
     stack = [nfa.start]
