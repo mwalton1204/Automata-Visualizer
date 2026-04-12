@@ -1,3 +1,15 @@
+from services.regex_utils import is_symbol
+
+class State:
+    def __init__(self):
+        self.transitions = {} # symbol -> set of states
+        self.epsilon = set() # ε-transitions
+
+class NFA:
+    def __init__(self, start: State, accept: State):
+        self.start = start
+        self.accept = accept
+
 """
 Convert a postfix regular expression into an NFA using Thompson's construction.
 
@@ -17,27 +29,13 @@ Why postfix works:
 - So when we see an operator, the required fragments are already on the stack
 """
 
-from services.regex_utils import is_symbol
-
-class State:
-    def __init__(self):
-        self.transitions = {} # symbol -> set of states
-        self.epsilon = set() # ε-transitions
-
-class NFA:
-    def __init__(self, start: State, accept: State):
-        self.start = start
-        self.accept = accept
-
 def postfix_to_nfa(postfix: str) -> NFA:
-
     stack = []
 
     for char in postfix:
 
         # SYMBOL
-        # Create the simplest NFA:
-        #   start --char--> accept
+        # start -- char --> accept
         if is_symbol(char):
             start = State()
             accept = State()
@@ -48,39 +46,38 @@ def postfix_to_nfa(postfix: str) -> NFA:
             stack.append(NFA(start, accept))
 
         # UNARY OPERATORS (*, +, ?)
-        # Operate on ONE fragment
         elif char in {'*', '+', '?'}:
             nfa = stack.pop()
 
             start = State()
             accept = State()
 
-            if char == '*':
-                # Kleene star (0 or more)
-                # - can skip entirely
-                # - can loop infinitely
-                start.epsilon.add(nfa.start)
+            if char == '*': # Zero or more
+                
+                # Can skip entirely
+                start.epsilon.add(nfa.start) 
                 start.epsilon.add(accept)
 
+                # Or can loop infinitely
                 nfa.accept.epsilon.add(nfa.start)
                 nfa.accept.epsilon.add(accept)
 
-            elif char == '+':
-                # One or more
-                # - must go through fragment once
-                # - then can loop
+            elif char == '+': # One or more
+
+                # Must go through fragment once
                 start.epsilon.add(nfa.start)
 
+                # Then can loop
                 nfa.accept.epsilon.add(nfa.start)
                 nfa.accept.epsilon.add(accept)
 
-            elif char == '?':
-                # Optional (0 or 1)
-                # - either skip
-                # - or go through once
+            elif char == '?': # Either zero or one
+                
+                # Either skip
                 start.epsilon.add(nfa.start)
                 start.epsilon.add(accept)
 
+                # Or go through once
                 nfa.accept.epsilon.add(accept)
 
             stack.append(NFA(start, accept))
@@ -91,7 +88,7 @@ def postfix_to_nfa(postfix: str) -> NFA:
             right = stack.pop()  # second operand
             left = stack.pop()   # first operand
 
-            # Connect left → right
+            # Connect left -> right
             left.accept.epsilon.add(right.start)
 
             stack.append(NFA(left.start, right.accept))
@@ -99,8 +96,8 @@ def postfix_to_nfa(postfix: str) -> NFA:
         # UNION (|)
         # Branch: choose left OR right
         elif char == '|':
-            right = stack.pop()
-            left = stack.pop()
+            right = stack.pop() # second operand
+            left = stack.pop()# first operand
 
             start = State()
             accept = State()
@@ -123,3 +120,57 @@ def postfix_to_nfa(postfix: str) -> NFA:
         raise ValueError("Invalid postfix expression")
 
     return stack[0]
+
+"""
+Convert an NFA made of linked State objects into a JSON-friendly dictionary.
+
+Since State objects reference each other directly, we first assign each
+reachable state a numeric ID, then collect all transitions using those IDs.
+"""
+
+def nfa_to_dict(nfa: NFA) -> dict:
+    state_ids = {}
+    transitions = []
+    stack = [nfa.start]
+    next_id = 0
+
+    # First pass: discover all reachable states and assign IDs
+    while stack:
+        state = stack.pop()
+
+        if state in state_ids:
+            continue
+
+        state_ids[state] = next_id
+        next_id += 1
+
+        for targets in state.transitions.values():
+            for target in targets:
+                stack.append(target)
+
+        for target in state.epsilon:
+            stack.append(target)
+
+    # Second pass: collect transitions using assigned IDs
+    for state, state_id in state_ids.items():
+        for symbol, targets in state.transitions.items():
+            for target in targets:
+                transitions.append({
+                    "from": state_id,
+                    "to": state_ids[target],
+                    "symbol": symbol
+                })
+
+        for target in state.epsilon:
+            transitions.append({
+                "from": state_id,
+                "to": state_ids[target],
+                "symbol": "ε"
+            })
+
+    return {
+        "states": list(state_ids.values()),
+        "start": state_ids[nfa.start],
+        "accept": state_ids[nfa.accept],
+        "transitions": transitions
+    }
