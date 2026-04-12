@@ -27,7 +27,7 @@ export default function Home() {
         throw new Error('Request failed')
       }
 
-      // Convert backend response to json and make it into a JavaScript object
+      // Convert backend response to json and turn it into a JavaScript object
       const data = await response.json()
       setResult(data)
     } catch (err) { // Handle errors

@@ -42,20 +42,19 @@ backend/venv/
 !frontend/next.config.js
 !frontend/tsconfig.json
 
-# Allow source folders
+# Allow directories themselves FIRST
 !frontend/app/
-!frontend/app/**
-
 !frontend/components/
-!frontend/components/**
-
 !frontend/public/
-!frontend/public/**
-
 !frontend/styles/
+
+# Then allow their contents
+!frontend/app/**
+!frontend/components/**
+!frontend/public/**
 !frontend/styles/**
 
-# Ignore frontend junk
+# Ignore junk
 frontend/node_modules/
 frontend/.next/
 frontend/out/
