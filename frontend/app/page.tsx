@@ -1,17 +1,22 @@
 'use client'
 
+import ReactFlow from 'reactflow'
+import 'reactflow/dist/style.css'
 import { useState } from 'react'
+import { nfaToGraph } from '@/lib/nfaToGraph'
 
 export default function Home() {
   const [regex, setRegex] = useState('')
   const [result, setResult] = useState<any>(null)
   const [error, setError] = useState('')
 
+  // Build graph data from the current backend result
+  const graph = result?.nfa ? nfaToGraph(result.nfa) : null
+
   async function handleConvert() {
     // Clear previous results and errors
     setError('')
     setResult(null)
-
 
     try {
       // Send the regex to backend API and await the response
@@ -28,10 +33,10 @@ export default function Home() {
         throw new Error('Request failed')
       }
 
-      // Convert backend response to json and turn it into a JavaScript object
+      // Convert backend response to JSON and store it in state
       const data = await response.json()
       setResult(data)
-    } catch (err) { // Handle errors
+    } catch (err) {
       setError('Could not connect to backend')
       console.error(err)
     }
@@ -50,7 +55,7 @@ export default function Home() {
             id="regex"
             type="text"
             value={regex}
-            onChange={(e) => setRegex(e.target.value)} // Set regex state on input change
+            onChange={(e) => setRegex(e.target.value)}
             placeholder="Example: (a|b)*abb"
             className="w-full rounded border px-3 py-2"
           />
@@ -75,6 +80,12 @@ export default function Home() {
             <pre className="overflow-x-auto text-sm">
               {JSON.stringify(result, null, 2)}
             </pre>
+          </div>
+        )}
+
+        {graph && (
+          <div className="h-[500px] w-full rounded border">
+            <ReactFlow nodes={graph.nodes} edges={graph.edges} fitView />
           </div>
         )}
       </div>
