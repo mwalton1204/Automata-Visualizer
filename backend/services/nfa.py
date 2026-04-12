@@ -19,15 +19,12 @@ def postfix_to_nfa(postfix: str) -> NFA:
     - Each fragment has:
         - start state
         - accept state
-    - When we see:
+    - When algorithm encounters:
         - a symbol → create a basic NFA and push it
         - a unary operator (*, +, ?) → pop 1 fragment, modify it, push result
         - a binary operator (., |) → pop 2 fragments, combine them, push result
     - At the end, exactly one NFA should remain on the stack
 
-    Why postfix works:
-    - Operators come AFTER their operands
-    - So when we see an operator, the required fragments are already on the stack
     """
 
     stack = []
@@ -125,7 +122,7 @@ def nfa_to_dict(nfa: NFA) -> dict:
     """
     Convert an NFA made of linked State objects into a JSON-friendly dictionary.
 
-    Since State objects reference each other directly, we first assign each
+    Since State objects reference each other directly, must first assign each
     reachable state a numeric ID, then collect all transitions using those IDs.
     """
 
