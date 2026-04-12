@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+from services.regex_utils import insert_concat, to_postfix
+
 app = FastAPI()
 
 # Allow frontend to access backend API during local development
@@ -22,7 +24,13 @@ def root():
 
 @app.post("/convert") # Use POST for sending data
 def convert(req: RegexRequest):
+    raw_regex = req.regex.strip() # Remove whitespace
+
+    with_concat = insert_concat(raw_regex)
+    postfix = to_postfix(with_concat)
+
     return {
-        "input": req.regex,
-        "message": "Backend received the regex successfully!"
+        "input": raw_regex,
+        "with_concat": with_concat,
+        "postfix": postfix
     }
