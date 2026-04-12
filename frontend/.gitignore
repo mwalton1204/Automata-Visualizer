@@ -1,41 +1,93 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# =========================
+# Ignore EVERYTHING
+# =========================
+*
 
-# dependencies
-/node_modules
-/.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
+# =========================
+# Allow directory traversal
+# (CRITICAL for whitelist)
+# =========================
+!backend/
+!frontend/
 
-# testing
-/coverage
+# Allow traversal inside
+!backend/**
+!frontend/**
 
-# next.js
-/.next/
-/out/
+# =========================
+# BACKEND (Python)
+# =========================
 
-# production
-/build
+# Allow ONLY python source + minimal config
+!backend/**/*.py
+!backend/requirements.txt
+!backend/pyproject.toml
 
-# misc
+# Explicitly ignore Python junk
+backend/**/__pycache__/
+backend/**/*.pyc
+backend/**/*.pyo
+backend/**/*.pyd
+
+# Virtual environment (never track)
+backend/venv/
+
+# =========================
+# FRONTEND (Next.js)
+# =========================
+
+# Allow core config
+!frontend/package.json
+!frontend/package-lock.json
+!frontend/next.config.js
+!frontend/tsconfig.json
+
+# Allow source folders
+!frontend/app/
+!frontend/app/**
+
+!frontend/components/
+!frontend/components/**
+
+!frontend/public/
+!frontend/public/**
+
+!frontend/styles/
+!frontend/styles/**
+
+# Ignore frontend junk
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.turbo/
+
+# =========================
+# ROOT FILES
+# =========================
+!.gitignore
+!README.md
+
+# =========================
+# GLOBAL JUNK (override everything)
+# =========================
+
+# Python cache (safety net)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Logs
+*.log
+
+# Env files
+.env
+.env.*
+
+# OS files
 .DS_Store
-*.pem
+Thumbs.db
 
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# env files (can opt-in for committing if needed)
-.env*
-
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+# Editor
+.vscode/
+.idea/
