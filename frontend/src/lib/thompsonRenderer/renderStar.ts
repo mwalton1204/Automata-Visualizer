@@ -1,5 +1,5 @@
 import type { ThompsonNode } from '@/types/automata'
-import type { FragmentVisual } from './types'
+import type { FragmentVisual, VisualEdge } from './types'
 import { renderThompson } from './renderThompson'
 import { offsetFragment } from './utils'
 import { HORIZONTAL_GAP } from './geometry'
@@ -43,7 +43,7 @@ export function renderStar(
     ...childFrag.nodes,
   ]
 
-  const edges = [
+  const edges: VisualEdge[] = [
     ...childFrag.edges,
 
     // Enter child
@@ -52,7 +52,7 @@ export function renderStar(
       from: startId,
       to: childFrag.startId,
       label: 'ε',
-      kind: 'straight' as const,
+      kind: 'straight',
     },
 
     // Exit child to accept
@@ -61,7 +61,7 @@ export function renderStar(
       from: childFrag.acceptId,
       to: acceptId,
       label: 'ε',
-      kind: 'straight' as const,
+      kind: 'straight',
     },
 
     // Bypass: start directly to accept
@@ -70,7 +70,7 @@ export function renderStar(
       from: startId,
       to: acceptId,
       label: 'ε',
-      kind: 'arc-down' as const,
+      kind: 'bypass-arc',
     },
 
     // Loopback: child accept back to child start
@@ -79,7 +79,7 @@ export function renderStar(
       from: childFrag.acceptId,
       to: childFrag.startId,
       label: 'ε',
-      kind: 'arc-up' as const,
+      kind: 'loopback-arc',
     },
   ]
 

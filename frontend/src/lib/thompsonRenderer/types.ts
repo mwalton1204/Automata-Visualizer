@@ -9,8 +9,8 @@ export type VisualNode = {
 
 export type EdgeKind =
   | 'straight'
-  | 'arc-up'
-  | 'arc-down'
+  | 'bypass-arc'
+  | 'loopback-arc'
   | 'loop'
 
 export type VisualEdge = {

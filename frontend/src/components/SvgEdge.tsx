@@ -6,6 +6,21 @@ type Props = {
   nodesById: Record<string, VisualNode>
 }
 
+function getDynamicArcClearance(
+  nodesInSpan: VisualNode[],
+  sourceX: number,
+  targetX: number
+): number {
+  const spanWidth = Math.abs(targetX - sourceX)
+  const nodeCount = nodesInSpan.length
+
+  const baseClearance = 50
+  const widthBonus = spanWidth * 0.08
+  const densityBonus = Math.max(0, nodeCount - 2) * 8
+
+  return baseClearance + widthBonus + densityBonus
+}
+
 export default function SvgEdge({ edge, nodesById }: Props) {
   const fromNode = nodesById[edge.from]
   const toNode = nodesById[edge.to]
@@ -26,14 +41,14 @@ export default function SvgEdge({ edge, nodesById }: Props) {
   let x2 = toNode.x - unitX * STATE_RADIUS
   let y2 = toNode.y - unitY * STATE_RADIUS
 
-  if (edge.kind === 'arc-up') {
+  if (edge.kind === 'bypass-arc') {
     x1 = fromNode.x
     y1 = fromNode.y - STATE_RADIUS
     x2 = toNode.x
     y2 = toNode.y - STATE_RADIUS
   }
 
-  if (edge.kind === 'arc-down') {
+  if (edge.kind === 'loopback-arc') {
     x1 = fromNode.x
     y1 = fromNode.y + STATE_RADIUS
     x2 = toNode.x
@@ -67,23 +82,25 @@ export default function SvgEdge({ edge, nodesById }: Props) {
       ? Math.max(...nodesInSpan.map((node) => node.y + STATE_RADIUS))
       : Math.max(fromNode.y, toNode.y)
 
-  const ARC_CLEARANCE = 90
+  const dynamicClearance = getDynamicArcClearance(
+    nodesInSpan,
+    fromNode.x,
+    toNode.x
+  )
 
-  if (edge.kind === 'arc-up') {
-    const controlY = topmostY - ARC_CLEARANCE
+  if (edge.kind === 'bypass-arc') {
+    const controlY = topmostY - dynamicClearance
     path = `M ${x1} ${y1} Q ${midX} ${controlY} ${x2} ${y2}`
 
-    // Place label around 35% across the curve instead of dead center
     labelX = x1 + (x2 - x1) * 0.35
     labelY = controlY - 12
   }
 
-  if (edge.kind === 'arc-down') {
-    const controlY = bottommostY + ARC_CLEARANCE
+  if (edge.kind === 'loopback-arc') {
+    const controlY = bottommostY + dynamicClearance
     path = `M ${x1} ${y1} Q ${midX} ${controlY} ${x2} ${y2}`
 
-    // Place label around 65% across the curve
-    labelX = x1 + (x2 - x1) * 0.65
+    labelX = x1 + (x2 - x1) * 0.7
     labelY = controlY + 20
   }
 
@@ -93,6 +110,12 @@ export default function SvgEdge({ edge, nodesById }: Props) {
     labelX = fromNode.x
     labelY = loopTop - 8
   }
+
+  const shouldRenderLabel =
+    edge.kind === 'straight' ||
+    edge.kind === 'loop' ||
+    edge.kind === 'bypass-arc' ||
+    edge.kind === 'loopback-arc'
 
   return (
     <g>
@@ -104,16 +127,18 @@ export default function SvgEdge({ edge, nodesById }: Props) {
         markerEnd="url(#arrowhead)"
       />
 
-      <text
-        x={labelX}
-        y={labelY}
-        textAnchor="middle"
-        fontSize="14"
-        fontWeight="600"
-        fill="black"
-      >
-        {edge.label}
-      </text>
+      {shouldRenderLabel && (
+        <text
+          x={labelX}
+          y={labelY}
+          textAnchor="middle"
+          fontSize="14"
+          fontWeight="600"
+          fill="black"
+        >
+          {edge.label}
+        </text>
+      )}
     </g>
   )
 }
