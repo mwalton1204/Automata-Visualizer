@@ -14,7 +14,7 @@ def insert_concat(regex: str) -> str: # Insert explicit concatenation operator
         next_char = regex[i+1]
 
         left_can_end = is_symbol(current) or current in {')', '*', '+', '?'}
-        right_can_start = is_symbol(next_char) or next_char in {'('}
+        right_can_start = is_symbol(next_char) or next_char in '('
 
         if left_can_end and right_can_start:
             result.append('.')
@@ -53,28 +53,36 @@ def to_postfix(regex: str) -> str:
     for char in regex:
         if is_symbol(char):
             output.append(char)
+
         elif char == '(':
             opstack.append(char)
+
         elif char == ')':
-            while opstack and opstack[-1] != '(': # Pop until '(' found
+            # Pop until '(' is found
+            while opstack and opstack[-1] != '(':
                 output.append(opstack.pop())
-                
-                if not opstack:
-                    raise ValueError("Mismatched parentheses")
-                
-                opstack.pop() # Pop the '(
-                
-        else: # Operator found
-            # Pop operators with higher or equal precedence
-            while (opstack and opstack[-1] != '(' and precedence(opstack[-1]) >= precedence(char)):
+
+            # If no '(' is found, parentheses are mismatched
+            if not opstack:
+                raise ValueError("Mismatched parentheses")
+
+            # Pop the '('
+            opstack.pop()
+
+        else:  # Operator found
+            while (
+                opstack
+                and opstack[-1] != '('
+                and precedence(opstack[-1]) >= precedence(char)
+            ):
                 output.append(opstack.pop())
 
             opstack.append(char)
-    
+
     while opstack:
         if opstack[-1] == '(':
             raise ValueError("Mismatched parentheses")
         output.append(opstack.pop())
-    
+
     return ''.join(output)
             

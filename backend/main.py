@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from services.regex_utils import insert_concat, to_postfix
 from services.nfa import postfix_to_nfa, nfa_to_dict
 from services.dfa import nfa_to_dfa, dfa_to_dict
+from services.thompson_tree import postfix_to_thompson_tree
 
 app = FastAPI()
 
@@ -30,6 +31,7 @@ def convert(req: RegexRequest):
 
     with_concat = insert_concat(raw_regex)
     postfix = to_postfix(with_concat)
+    thompson_tree = postfix_to_thompson_tree(postfix)
     nfa = postfix_to_nfa(postfix)
     nfa_data = nfa_to_dict(nfa)
     dfa = nfa_to_dfa(nfa)
@@ -39,6 +41,7 @@ def convert(req: RegexRequest):
         "input": raw_regex,
         "with_concat": with_concat,
         "postfix": postfix,
+        "thompson_tree": thompson_tree,
         "nfa": nfa_data,
         "dfa": dfa_data
     }

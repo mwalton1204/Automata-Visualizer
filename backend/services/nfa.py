@@ -168,6 +168,6 @@ def nfa_to_dict(nfa: NFA) -> dict:
     return {
         "states": list(state_ids.values()),
         "start": state_ids[nfa.start],
-        "accept": state_ids[nfa.accept],
+        "accepts": [state_ids[nfa.accept]],
         "transitions": transitions
     }
