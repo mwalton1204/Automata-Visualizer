@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import type { ConvertResponse } from '@/types/automata'
+import ThompsonRenderer from '@/components/ThompsonRenderer'
 
 export default function Home() {
   const [regex, setRegex] = useState('')
@@ -73,6 +74,25 @@ export default function Home() {
             <pre className="overflow-x-auto rounded-lg bg-zinc-950 p-3 text-sm text-zinc-300">
               {JSON.stringify(result, null, 2)}
             </pre>
+          </div>
+        )}
+
+        {result?.thompson_tree && (
+          <div className="rounded border p-4">
+            <h2 className="text-lg font-semibold">Thompson Tree</h2>
+            <pre className="text-sm">
+              {JSON.stringify(result.thompson_tree, null, 2)}
+            </pre>
+          </div>
+        )}
+
+        {result?.thompson_tree && (
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-4 shadow-lg">
+            <h2 className="mb-4 text-xl font-semibold text-zinc-100">
+              Custom Thompson Renderer
+            </h2>
+
+            <ThompsonRenderer tree={result.thompson_tree} />
           </div>
         )}
 
