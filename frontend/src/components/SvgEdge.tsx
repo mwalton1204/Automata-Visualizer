@@ -21,6 +21,38 @@ function getDynamicArcClearance(
   return baseClearance + widthBonus + densityBonus
 }
 
+function getQuadraticPoint(
+  t: number,
+  p0: { x: number; y: number },
+  p1: { x: number; y: number },
+  p2: { x: number; y: number }
+) {
+  const oneMinusT = 1 - t
+
+  return {
+    x:
+      oneMinusT * oneMinusT * p0.x +
+      2 * oneMinusT * t * p1.x +
+      t * t * p2.x,
+    y:
+      oneMinusT * oneMinusT * p0.y +
+      2 * oneMinusT * t * p1.y +
+      t * t * p2.y,
+  }
+}
+
+function getQuadraticTangent(
+  t: number,
+  p0: { x: number; y: number },
+  p1: { x: number; y: number },
+  p2: { x: number; y: number }
+) {
+  return {
+    x: 2 * (1 - t) * (p1.x - p0.x) + 2 * t * (p2.x - p1.x),
+    y: 2 * (1 - t) * (p1.y - p0.y) + 2 * t * (p2.y - p1.y),
+  }
+}
+
 export default function SvgEdge({ edge, nodesById }: Props) {
   const fromNode = nodesById[edge.from]
   const toNode = nodesById[edge.to]
@@ -92,16 +124,59 @@ export default function SvgEdge({ edge, nodesById }: Props) {
     const controlY = topmostY - dynamicClearance
     path = `M ${x1} ${y1} Q ${midX} ${controlY} ${x2} ${y2}`
 
-    labelX = x1 + (x2 - x1) * 0.35
-    labelY = controlY - 12
+    const t = 0.88
+    const point = getQuadraticPoint(
+      t,
+      { x: x1, y: y1 },
+      { x: midX, y: controlY },
+      { x: x2, y: y2 }
+    )
+    const tangent = getQuadraticTangent(
+      t,
+      { x: x1, y: y1 },
+      { x: midX, y: controlY },
+      { x: x2, y: y2 }
+    )
+
+    const tangentLength = Math.sqrt(tangent.x * tangent.x + tangent.y * tangent.y) || 1
+    const tangentUnitX = tangent.x / tangentLength
+    const tangentUnitY = tangent.y / tangentLength
+
+    const curveNormalX = -tangentUnitY
+    const curveNormalY = tangentUnitX
+
+    labelX = point.x + curveNormalX * -14
+    labelY = point.y + curveNormalY * -14
   }
 
   if (edge.kind === 'loopback-arc') {
     const controlY = bottommostY + dynamicClearance
     path = `M ${x1} ${y1} Q ${midX} ${controlY} ${x2} ${y2}`
 
-    labelX = x1 + (x2 - x1) * 0.7
-    labelY = controlY + 20
+    const t = 0.88
+    const point = getQuadraticPoint(
+      t,
+      { x: x1, y: y1 },
+      { x: midX, y: controlY },
+      { x: x2, y: y2 }
+    )
+    const tangent = getQuadraticTangent(
+      t,
+      { x: x1, y: y1 },
+      { x: midX, y: controlY },
+      { x: x2, y: y2 }
+    )
+
+    const tangentLength =
+      Math.sqrt(tangent.x * tangent.x + tangent.y * tangent.y) || 1
+    const tangentUnitX = tangent.x / tangentLength
+    const tangentUnitY = tangent.y / tangentLength
+
+    const curveNormalX = -tangentUnitY
+    const curveNormalY = tangentUnitX
+
+    labelX = point.x - curveNormalX * 14
+    labelY = point.y - curveNormalY * 14
   }
 
   if (edge.kind === 'loop') {
@@ -132,6 +207,7 @@ export default function SvgEdge({ edge, nodesById }: Props) {
           x={labelX}
           y={labelY}
           textAnchor="middle"
+          dominantBaseline="middle"
           fontSize="14"
           fontWeight="600"
           fill="black"
