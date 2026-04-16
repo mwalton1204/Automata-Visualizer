@@ -4,6 +4,12 @@ import { renderLiteral } from './renderLiteral'
 import { renderConcat } from './renderConcat'
 import { renderUnion } from './renderUnion'
 import { renderStar } from './renderStar'
+import { renderPlus } from './renderPlus'
+import { renderOptional } from './renderOptional'
+
+function assertNever(value: never): never {
+  throw new Error('Unhandled Thompson node type')
+}
 
 export function renderThompson(
   node: ThompsonNode,
@@ -23,7 +29,13 @@ export function renderThompson(
     case 'star':
       return renderStar(node.child, originX, originY)
 
+    case 'plus':
+      return renderPlus(node.child, originX, originY)
+
+    case 'optional':
+      return renderOptional(node.child, originX, originY)
+
     default:
-      throw new Error(`Renderer for node type "${node.type}" is not implemented yet`)
+      return assertNever(node)
   }
 }
