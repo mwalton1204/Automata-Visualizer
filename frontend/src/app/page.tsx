@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import type { ConvertResponse } from '@/types/automata'
 import ThompsonRenderer from '@/components/ThompsonRenderer'
+import DFARenderer from '@/components/DFARenderer'
 
 export default function Home() {
   const [regex, setRegex] = useState('')
@@ -75,6 +76,16 @@ export default function Home() {
             </h2>
 
             <ThompsonRenderer tree={result.thompson_tree} />
+          </div>
+        )}
+
+        {result?.dfa && (
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-4 shadow-lg">
+            <h2 className="mb-4 text-xl font-semibold text-zinc-100">
+              DFA Visualization
+            </h2>
+
+            <DFARenderer dfa={result.dfa} />
           </div>
         )}
 
