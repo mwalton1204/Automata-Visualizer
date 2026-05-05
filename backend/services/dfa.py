@@ -154,17 +154,10 @@ def nfa_to_dfa(nfa: NFA) -> DFA:
         
     return DFA(start_state, accept_states, transitions, alphabet)
 
-def dfa_to_dict(dfa: DFA) -> dict:
-    """
-    Convert a DFA into a JSON-friendly dictionary.
-
-    DFA states are frozensets of NFA State objects, so assign each DFA state
-    a numeric ID for serialization and frontend visualization.
-    """
+def build_state_ids(dfa: DFA) -> dict:
     state_ids = {}
     next_id = 0
 
-    # Assign IDs to all DFA states that appear in transitions
     for state in dfa.transitions:
         if state not in state_ids:
             state_ids[state] = next_id
@@ -175,10 +168,19 @@ def dfa_to_dict(dfa: DFA) -> dict:
                 state_ids[target] = next_id
                 next_id += 1
 
-    # Make sure start state is included
     if dfa.start_state not in state_ids:
         state_ids[dfa.start_state] = next_id
-        next_id += 1
+
+    return state_ids
+
+def dfa_to_dict(dfa: DFA) -> dict:
+    """
+    Convert a DFA into a JSON-friendly dictionary.
+
+    DFA states are frozensets of NFA State objects, so assign each DFA state
+    a numeric ID for serialization and frontend visualization.
+    """
+    state_ids = build_state_ids(dfa)
 
     transitions = []
 
@@ -196,3 +198,24 @@ def dfa_to_dict(dfa: DFA) -> dict:
         "accepts": [state_ids[state] for state in dfa.accept_states],
         "transitions": transitions
     }
+
+def simulate_dfa(dfa: DFA, state_ids: dict, input_str: str) -> dict:
+    """
+    Walk the DFA one character at a time and record the state path.
+
+    Returns the sequence of state IDs visited and whether the string was accepted.
+    If a character has no transition (dead state), simulation stops early.
+    """
+    current = dfa.start_state
+    path = [state_ids[current]]
+
+    for char in input_str:
+        symbol_map = dfa.transitions.get(current, {})
+
+        if char not in symbol_map:
+            return {"accepted": False, "path": path, "dead_at": len(path) - 1}
+
+        current = symbol_map[char]
+        path.append(state_ids[current])
+
+    return {"accepted": current in dfa.accept_states, "path": path, "dead_at": None}
