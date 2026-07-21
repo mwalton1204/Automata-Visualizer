@@ -127,8 +127,6 @@ Malformed request bodies are handled by FastAPI's request validation.
 - Python 3.10 or newer
 - A modern web browser
 
-No Node.js installation or frontend build step is required.
-
 ### 1. Create a Python environment
 
 From the repository root:
@@ -137,12 +135,6 @@ From the repository root:
 python3 -m venv backend/venv
 source backend/venv/bin/activate
 pip install -r backend/requirements.txt
-```
-
-On Windows PowerShell, activate the environment with:
-
-```powershell
-backend\venv\Scripts\Activate.ps1
 ```
 
 ### 2. Start the API
@@ -198,10 +190,3 @@ at `http://127.0.0.1:8000`; the API URL can also be changed directly in the page
   to demonstrate the API contract without introducing a separate build system.
 - Local CORS access is restricted to `http://localhost:3000`. A deployed client
   origin must be explicitly added before publishing the live demo.
-
-## Future work
-
-- Publish the API and GitHub Pages playground as a live demo.
-- Add automated unit and integration coverage for parsing and automata conversion.
-- Add DFA minimization and equivalent-state analysis.
-- Support additional regular-expression syntax and escaped literals.
