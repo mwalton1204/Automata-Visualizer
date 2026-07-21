@@ -7,7 +7,7 @@ deterministic finite automata using subset construction.
 The repository also includes a dependency-free API playground for inspecting
 the conversion pipeline, transition tables, and JSON response data.
 
-**Live demo:** [API Playground](https://mwalton1204.github.io/regex-automata-api/)
+[**Live Demo**](https://mwalton1204.github.io/regex-automata-api/)
 
 ## Project overview
 
