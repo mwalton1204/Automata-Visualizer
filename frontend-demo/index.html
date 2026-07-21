@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Explore a REST API that converts regular expressions into NFAs and DFAs."
+    />
+    <title>Automata API Playground</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#">Regex Automata API Demo</a>
+      <a id="docs-link" class="docs-link" href="http://127.0.0.1:8000/docs" target="_blank" rel="noreferrer">
+        OpenAPI docs <span aria-hidden="true">↗</span>
+      </a>
+    </header>
+
+    <main>
+      <section class="panel playground" aria-labelledby="playground-heading">
+        <div class="panel-heading">
+          <div>
+            <p class="section-label">POST /convert</p>
+            <h1 id="playground-heading">Regex Conversion</h1>
+            <p class="endpoint-description">Convert a regular expression into Thompson NFA and DFA representations.</p>
+            <p class="accepted-description">
+              <span>Accepted characters:</span>
+              <span class="accepted-values">
+                <code>A–Z</code>
+                <code>a–z</code>
+                <code>0–9</code>
+                <code>ε</code>
+                <code>( )</code>
+                <code>.</code>
+                <code>|</code>
+                <code>*</code>
+                <code>+</code>
+                <code>?</code>
+              </span>
+            </p>
+          </div>
+          <label class="api-url">
+            API URL
+            <input id="api-url" type="url" value="http://127.0.0.1:8000" spellcheck="false" />
+          </label>
+        </div>
+
+        <form id="convert-form">
+          <div class="input-row">
+            <input
+              id="regex"
+              name="regex"
+              autocomplete="off"
+              spellcheck="false"
+              required
+            />
+            <button id="submit-button" type="submit">Convert</button>
+            <button id="reset-button" class="reset-button" type="button">Reset</button>
+          </div>
+        </form>
+
+        <div class="input-reference">
+          <div class="reference-row" aria-label="Example regular expressions">
+            <span class="reference-label">Examples:</span>
+            <div class="reference-values examples">
+              <button type="button" data-example="(a|b)*abb">(a|b)*abb</button>
+              <button type="button" data-example="a+b?">a+b?</button>
+              <button type="button" data-example="(ab|cd)+">(ab|cd)+</button>
+            </div>
+          </div>
+        </div>
+
+        <p id="status" class="status" role="status" aria-live="polite"></p>
+      </section>
+
+      <section id="results" class="results" hidden aria-live="polite">
+        <div class="pipeline" aria-label="Conversion pipeline">
+          <article>
+            <span>01 · Input</span>
+            <code id="input-output"></code>
+          </article>
+          <span class="pipeline-arrow" aria-hidden="true">→</span>
+          <article>
+            <span>02 · Explicit concat</span>
+            <code id="concat-output"></code>
+          </article>
+          <span class="pipeline-arrow" aria-hidden="true">→</span>
+          <article>
+            <span>03 · Postfix</span>
+            <code id="postfix-output"></code>
+          </article>
+        </div>
+
+        <div class="automata-grid">
+          <article class="panel automaton-card">
+            <div class="card-heading">
+              <div>
+                <p class="section-label">Thompson construction</p>
+                <h2>Nondeterministic Finite Automaton</h2>
+              </div>
+              <span id="nfa-count" class="count"></span>
+            </div>
+            <dl id="nfa-summary" class="summary"></dl>
+            <div class="transition-section">
+              <h3>Transition table</h3>
+              <div class="table-scroll-shell">
+                <div id="nfa-transitions" class="table-scroll"></div>
+              </div>
+            </div>
+            <details>
+              <summary>View JSON</summary>
+              <pre><code id="nfa-json"></code></pre>
+            </details>
+          </article>
+
+          <article class="panel automaton-card">
+            <div class="card-heading">
+              <div>
+                <p class="section-label">Subset construction</p>
+                <h2>Deterministic Finite Automaton</h2>
+              </div>
+              <span id="dfa-count" class="count"></span>
+            </div>
+            <dl id="dfa-summary" class="summary"></dl>
+            <div class="transition-section">
+              <h3>Transition table</h3>
+              <div class="table-scroll-shell">
+                <div id="dfa-transitions" class="table-scroll"></div>
+              </div>
+            </div>
+            <details>
+              <summary>View JSON</summary>
+              <pre><code id="dfa-json"></code></pre>
+            </details>
+          </article>
+        </div>
+
+        <article class="panel payload-card">
+          <div class="card-heading">
+            <div>
+              <p class="section-label">Response</p>
+              <h2>Response Payload</h2>
+            </div>
+            <div class="response-meta" aria-label="Response metadata">
+              <span>200 OK</span>
+              <code>application/json</code>
+            </div>
+          </div>
+          <details>
+            <summary>View JSON</summary>
+            <pre><code id="full-json"></code></pre>
+          </details>
+        </article>
+
+        <article class="panel request-card">
+          <div class="card-heading">
+            <div>
+              <p class="section-label">Use it yourself</p>
+              <h2>Request with cURL</h2>
+            </div>
+            <button id="copy-curl" class="secondary-button" type="button">Copy</button>
+          </div>
+          <pre><code id="curl-output"></code></pre>
+        </article>
+      </section>
+
+    </main>
+  </body>
+</html>

@@ -1,54 +1,70 @@
-# =========================
-# Python (backend)
-# =========================
-backend/venv/
-backend/__pycache__/
-backend/**/*.pyc
-backend/**/*.pyo
-backend/**/*.pyd
-
-# Global Python safety net
+# Python bytecode and caches
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyright/
+.hypothesis/
 
-# =========================
-# Node / Next.js (frontend)
-# =========================
-frontend/node_modules/
-frontend/.next/
-frontend/out/
-frontend/.turbo/
+# Python environments and packages
+.venv/
+venv/
+env/
+ENV/
+*.egg-info/
+.eggs/
+wheels/
+
+# Python test and coverage output
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.tox/
+.nox/
+
+# Node dependencies and framework output
+node_modules/
+.next/
+out/
+.turbo/
+.parcel-cache/
+.npm/
+.yarn/cache/
+.yarn/unplugged/
+*.tsbuildinfo
+
+# Build output and temporary files
+build/
+dist/
+.cache/
+tmp/
+temp/
+*.tmp
+*.swp
+*.swo
+*~
+
+# Local environment variables and secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
 
 # Logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-*.log
 
-# =========================
-# Environment files
-# =========================
-.env
-.env.*
-frontend/.env.local
-frontend/.env.development
-frontend/.env.production
-
-# =========================
-# OS / Editor junk
-# =========================
-.DS_Store
-Thumbs.db
-
+# Editors and operating systems
 .vscode/
 .idea/
-
-# =========================
-# Build / temp
-# =========================
-dist/
-build/
-.cache/
+.DS_Store
+Thumbs.db
+Desktop.ini
