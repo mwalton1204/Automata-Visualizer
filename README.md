@@ -7,7 +7,8 @@ deterministic finite automata using subset construction.
 The repository also includes a dependency-free API playground for inspecting
 the conversion pipeline, transition tables, and JSON response data.
 
-> **Live demo:** Coming soon
+> **Live demo:** [API Playground](https://mwalton1204.github.io/Automata-Visualizer/)
+> · [OpenAPI documentation](https://regex-automata-api.onrender.com/docs)
 
 ## Project overview
 
@@ -139,12 +140,6 @@ From the repository root:
 python3 -m venv backend/venv
 source backend/venv/bin/activate
 pip install -r backend/requirements.txt
-```
-
-On Windows PowerShell, activate the environment with:
-
-```powershell
-backend\venv\Scripts\Activate.ps1
 ```
 
 ### 2. Start the API
