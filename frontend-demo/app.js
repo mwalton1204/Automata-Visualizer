@@ -142,6 +142,12 @@ async function convert(regex) {
   results.hidden = true
   setStatus('Sending request…')
 
+  const wakeMessageTimer = apiBaseUrl().includes('.onrender.com')
+    ? window.setTimeout(() => {
+        setStatus('Waking the free API instance. The first request may take up to a minute.')
+      }, 4000)
+    : null
+
   try {
     const response = await fetch(`${apiBaseUrl()}/convert`, {
       method: 'POST',
@@ -169,6 +175,7 @@ async function convert(regex) {
       : error.message
     setStatus(connectionHint, 'error')
   } finally {
+    if (wakeMessageTimer !== null) window.clearTimeout(wakeMessageTimer)
     submitButton.disabled = false
     submitButton.textContent = 'Convert'
   }
