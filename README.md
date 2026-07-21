@@ -127,6 +127,10 @@ Malformed request bodies are handled by FastAPI's request validation.
 - Python 3.10 or newer
 - A modern web browser
 
+The API and playground run as separate local processes. The committed dashboard
+uses the deployed Render API by default, but its API URL can be changed at
+runtime without modifying source files.
+
 ### 1. Create a Python environment
 
 From the repository root:
@@ -135,6 +139,12 @@ From the repository root:
 python3 -m venv backend/venv
 source backend/venv/bin/activate
 pip install -r backend/requirements.txt
+```
+
+On Windows PowerShell, activate the environment with:
+
+```powershell
+backend\venv\Scripts\Activate.ps1
 ```
 
 ### 2. Start the API
@@ -147,6 +157,14 @@ uvicorn main:app --reload
 The API will be available at <http://127.0.0.1:8000>, with interactive
 documentation at <http://127.0.0.1:8000/docs>.
 
+The API can be exercised without running the frontend:
+
+```bash
+curl -X POST http://127.0.0.1:8000/convert \
+  -H "Content-Type: application/json" \
+  -d '{"regex":"(a|b)*abb"}'
+```
+
 ### 3. Start the API playground
 
 In a second terminal, from the repository root:
@@ -156,8 +174,37 @@ cd frontend-demo
 python3 -m http.server 3000
 ```
 
-Open <http://localhost:3000>. The dashboard is configured to call the local API
-at `http://127.0.0.1:8000`; the API URL can also be changed directly in the page.
+Open <http://localhost:3000>. Use `localhost` rather than `127.0.0.1` for the
+frontend because that is the local origin permitted by the API's CORS policy.
+
+The dashboard is configured to call the deployed Render API by default. To use
+the local API:
+
+1. Find the **API URL** field in the upper-right corner of the dashboard.
+2. Replace its value with `http://127.0.0.1:8000`.
+3. Submit a regular expression. The OpenAPI documentation link will also update
+   to the local `/docs` endpoint.
+
+This setting lasts until the page is refreshed and requires no source changes.
+
+### Use localhost as the frontend default
+
+If repeatedly testing the local API, temporarily change these two values in
+`frontend-demo/index.html`:
+
+```html
+<a id="docs-link" href="http://127.0.0.1:8000/docs" ...>
+<input id="api-url" value="http://127.0.0.1:8000" ...>
+```
+
+Before committing or deploying the dashboard, restore both values to:
+
+```text
+https://regex-automata-api.onrender.com
+```
+
+The local API permits requests from `http://localhost:3000`, while the deployed
+API also permits the GitHub Pages origin `https://mwalton1204.github.io`.
 
 ## Project structure
 
@@ -188,5 +235,5 @@ at `http://127.0.0.1:8000`; the API URL can also be changed directly in the page
   represented in the API response.
 - The frontend intentionally uses plain HTML, CSS, and JavaScript. Its purpose is
   to demonstrate the API contract without introducing a separate build system.
-- Local CORS access is restricted to `http://localhost:3000`. A deployed client
-  origin must be explicitly added before publishing the live demo.
+- CORS is restricted to the local playground at `http://localhost:3000` and the
+  published GitHub Pages origin at `https://mwalton1204.github.io`.
